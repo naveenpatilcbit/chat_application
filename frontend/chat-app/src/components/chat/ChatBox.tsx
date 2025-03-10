@@ -35,6 +35,11 @@ const ChatBox = () => {
           placeholder="Type a message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && message.trim() !== "") {
+              handleSendMessage();
+            }
+          }}
         />
         <IconButton color="primary" onClick={handleSendMessage}>
           <SendIcon />

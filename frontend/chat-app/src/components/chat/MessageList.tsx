@@ -40,6 +40,12 @@ export const MessageList = () => {
   };
 
   useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [messagesList]);
+
+  useEffect(() => {
     fetchMessages(page);
   }, [page]); // ✅ Empty dependency array to run once on mount
 
