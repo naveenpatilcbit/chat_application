@@ -3,33 +3,18 @@ require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const db = require("./db"); // MySQL connection from db.js
-
-const app = express();
-app.use(express.json());
-
-const PORT = process.env.PORT || 3000;
-
+const db = require("./db");
+const redisClient = require("./../services/redisClient");
+const router = express.Router();
+const authenticateToken = require("./authMiddleware");
 // ====================
 // JWT Authentication Middleware
 // ====================
-function authenticateToken(req, res, next) {
-  // Expect the token in the Authorization header as "Bearer <token>"
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.sendStatus(401); // Unauthorized
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403); // Forbidden if token invalid/expired
-    req.user = user; // Attach user info to the request object
-    next();
-  });
-}
 
 // ====================
 // Login Endpoint
 // ====================
-app.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -69,22 +54,26 @@ app.post("/login", async (req, res) => {
 // ====================
 // Logout Endpoint
 // ====================
-app.post("/logout", (req, res) => {
-  // For JWT-based stateless authentication, logging out is usually handled on the client-side
-  // by deleting the stored token. If necessary, you can implement token blacklisting.
-  res.json({ message: "Logged out successfully" });
-});
+// Logout Endpoint with token invalidation
+app.post("/logout", authenticateToken, (req, res) => {
+  // Get token from Authorization header
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
-// ====================
-// Example Protected Route
-// ====================
-app.get("/protected", authenticateToken, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
-});
+  // Decode the token to find its expiry time
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.sendStatus(403);
 
-// ====================
-// Start the Server
-// ====================
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    // Calculate TTL (time-to-live) for the blacklist entry in seconds
+    const exp = decoded.exp;
+    const currentTime = Math.floor(Date.now() / 1000);
+    const ttl = exp - currentTime;
+
+    // Add the token to the blacklist in Redis with the calculated TTL
+    redisClient.set(token, "blacklisted", "EX", ttl, (err) => {
+      if (err)
+        return res.status(500).json({ message: "Error invalidating token" });
+      res.json({ message: "Logged out successfully" });
+    });
+  });
 });
