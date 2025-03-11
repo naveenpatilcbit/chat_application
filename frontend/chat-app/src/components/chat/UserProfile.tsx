@@ -7,6 +7,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import withAuth from "@utils/Auth";
 
 export default function UserProfile() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

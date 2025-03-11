@@ -5,6 +5,7 @@ import { ChatProvider } from "./context/ChatContext.tsx";
 import { CustomThemeProvider } from "./ThemeProviders/ThemeProvider";
 import UserProfile from "@components/chat/UserProfile.tsx";
 import { Box, AppBar, Toolbar } from "@mui/material";
+import withAuth from "@utils/Auth.tsx";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             </Box>
 
             {/* Right Side: User Profile */}
+
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <UserProfile />
             </Box>
@@ -30,4 +32,4 @@ function App() {
   );
 }
 
-export default App;
+export default withAuth(App);

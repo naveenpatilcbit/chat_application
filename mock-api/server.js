@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const loginEndpoints = require("./loginservice");
 const messagesEndpoints = require("./messagesService");
 
 const app = express();
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/", messagesEndpoints);
+app.use("/", loginEndpoints);
 
 app.listen(PORT, () => {
   console.log(`Mock API running at http://localhost:${PORT}`);
