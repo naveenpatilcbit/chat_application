@@ -55,7 +55,7 @@ router.post("/login", async (req, res) => {
 // Logout Endpoint
 // ====================
 // Logout Endpoint with token invalidation
-app.post("/logout", authenticateToken, (req, res) => {
+router.post("/logout", authenticateToken, (req, res) => {
   // Get token from Authorization header
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -77,3 +77,5 @@ app.post("/logout", authenticateToken, (req, res) => {
     });
   });
 });
+
+module.exports = router;
