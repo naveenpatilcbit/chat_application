@@ -6,7 +6,8 @@ const bcrypt = require("bcrypt");
 const db = require("./db");
 const redisClient = require("./../services/redisClient");
 const router = express.Router();
-const authenticateToken = require("./authMiddleware");
+const authenticateToken = require("./../middleware/authMiddleware");
+const ChatClientManager = require("../models/ChatClientManager");
 // ====================
 // JWT Authentication Middleware
 // ====================
@@ -44,6 +45,11 @@ router.post("/login", async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    // Create a new ChatClient for this session
+    const chatClientManager = ChatClientManager.getInstance();
+    chatClientManager.createClient(user.id, token);
+
     res.json({ token });
   } catch (error) {
     console.error("Login error:", error);
@@ -59,6 +65,10 @@ router.post("/logout", authenticateToken, (req, res) => {
   // Get token from Authorization header
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
+
+  // Remove the ChatClient for this session
+  const chatClientManager = ChatClientManager.getInstance();
+  chatClientManager.removeClient(token);
 
   // Decode the token to find its expiry time
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
