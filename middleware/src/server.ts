@@ -1,15 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const authenticateToken = require("./authMiddleware");
-const loginEndpoints = require("./controllers/logincontroller");
-const messagesEndpoints = require("./controllers/messagecontroller");
+import express, { Express, Request, Response, NextFunction } from "express";
+import cors from "cors";
+import authenticateToken from "./middleware/authMiddleware";
+import loginEndpoints from "./controllers/logincontroller";
+import messagesEndpoints from "./controllers/chat";
+import dotenv from "dotenv";
+dotenv.config();
 
-const app = express();
-const PORT = 5001;
+const app: Express = express();
+const PORT: number = 5001;
 
 app.use(express.json());
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   console.log("responding...");
   res.header("Access-Control-Allow-Origin", "*"); // Allow any origin
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Allow all methods
@@ -26,9 +28,9 @@ app.use((req, res, next) => {
 });
 
 // If you have public routes (e.g., login, register), you can exclude them:
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction): void => {
   // Array of public paths that don't require authentication
-  const publicPaths = ["/login", "/register"];
+  const publicPaths: string[] = ["/login", "/register"];
   if (publicPaths.includes(req.path)) {
     return next();
   }
@@ -40,5 +42,5 @@ app.use("/", messagesEndpoints);
 app.use("/", loginEndpoints);
 
 app.listen(PORT, () => {
-  console.log(`Mock API running at http://localhost:${PORT}`);
+  console.log(`ChatApp Middleware running at http://localhost:${PORT}`);
 });
