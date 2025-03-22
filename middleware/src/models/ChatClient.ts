@@ -127,16 +127,32 @@ async function fetchandRegisterMethodsProvidedByTool(tool: Tool) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const methodsData = (await response.json()) as MethodData[];
+    const responseData = await response.json();
+    if (
+      !responseData ||
+      typeof responseData !== "object" ||
+      !("endpoints" in responseData)
+    ) {
+      throw new Error("Invalid response format: missing endpoints array");
+    }
+    const methodsData = responseData.endpoints as MethodData[];
+
     methodsData.forEach((methodData: MethodData) => {
+      const mappedParams = methodData.parameters?.map((param) => ({
+        name: param.name,
+        description: param.description,
+        type: param.type,
+        required: param.required,
+      })) as MethodParam[];
+
       const method = new Method(
         methodData.methodName,
         methodData.description,
         methodData.operationType,
         methodData.endpointURL,
-        methodData.parameters
+        mappedParams
       );
-      tool.getSupportedMethods().push(method);
+      tool.addMethod(method);
     });
   } catch (error) {
     console.error(`Error fetching methods for tool ${tool.getName()}:`, error);

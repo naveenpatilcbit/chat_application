@@ -4,6 +4,7 @@ import actionCodeController from "../controllers/actionCodeController";
 const router = Router();
 router.get("/list-all-methods", actionCodeController.listAllMethods);
 router.post("/", actionCodeController.create);
+
 router.get("/", actionCodeController.getAll);
 router.get("/:id", actionCodeController.getById);
 router.put("/:id", actionCodeController.update);

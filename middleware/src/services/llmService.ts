@@ -48,6 +48,50 @@ class LLMService {
       const llmResponse = response.content.toString();
       logger.info("LLM response:", llmResponse);
 
+      // Parse the LLM response
+      const parsedResponse = JSON.parse(llmResponse);
+
+      if (parsedResponse.Decision) {
+        if (parsedResponse.Decision === "Tool required") {
+          const { "Final URL": finalUrl, Parameters } =
+            parsedResponse["Invocation Details"];
+
+          try {
+            const apiResponse = await fetch(finalUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(Parameters),
+            });
+
+            if (!apiResponse.ok) {
+              throw new Error(
+                `API call failed with status: ${apiResponse.status}`
+              );
+            }
+
+            const apiResult = await apiResponse.json();
+            return JSON.stringify({
+              message: parsedResponse.message,
+              llmInstructions: parsedResponse.llmInstructions,
+              mcpResponse: apiResult,
+            });
+          } catch (error) {
+            logger.error(
+              "API call failed:",
+              error instanceof Error ? error : new Error(String(error))
+            );
+            throw new Error("Failed to execute tool action");
+          }
+        } else {
+          return JSON.stringify({
+            message: parsedResponse.message,
+            response: parsedResponse["Response to User"],
+          });
+        }
+      }
+
       return llmResponse.trim();
     } catch (error) {
       if (error instanceof Error) {
@@ -64,7 +108,9 @@ class LLMService {
 
   private generatePrompts(message: string, chatClient: ChatClient): PromptPair {
     const tools = chatClient.getTools();
-    const toolsString = tools.map((tool) => tool.toJSON()).join("\n");
+    const toolsString = tools
+      .map((tool) => JSON.stringify(tool.toJSON(), null, 2))
+      .join("\n");
 
     return {
       system: systemPrompt.replace("{{tools}}", toolsString),

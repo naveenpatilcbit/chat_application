@@ -7,8 +7,6 @@ import authenticateToken from "../middleware/authMiddleware";
 import { ChatClientManager } from "../providers/ChatClientManager";
 import { RowDataPacket } from "mysql2";
 import loggerService from "../services/loggerService";
-import dotenv from "dotenv";
-dotenv.config();
 
 const router: Router = Router();
 

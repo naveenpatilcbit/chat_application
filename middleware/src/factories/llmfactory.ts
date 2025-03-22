@@ -9,7 +9,7 @@ type LLMProvider = "openai" | "anthropic";
  * @param providerName - The name of the provider ("openai" or "anthropic").
  * @returns An instance of the LLM.
  */
-function getLLMProvider(providerName: LLMProvider): BaseLanguageModel {
+export function getLLMProvider(providerName: LLMProvider): BaseLanguageModel {
   switch (providerName.toLowerCase()) {
     case "openai":
       return new ChatOpenAI({
@@ -29,4 +29,3 @@ function getLLMProvider(providerName: LLMProvider): BaseLanguageModel {
       throw new Error(`Unsupported provider: ${providerName}`);
   }
 }
-module.exports = getLLMProvider;

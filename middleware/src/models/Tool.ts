@@ -37,6 +37,9 @@ export class Tool {
     return [...this.supportedMethods];
   }
 
+  public addMethod(method: Method): void {
+    this.supportedMethods.push(method);
+  }
   // Setters
   public setName(name: string): void {
     this.name = name;

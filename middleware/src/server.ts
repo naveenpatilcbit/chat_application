@@ -1,11 +1,18 @@
+import dotenv from "dotenv";
+import path from "path";
+
+// Get the absolute path to the .env file
+const envPath = path.resolve(__dirname, "../.env");
+dotenv.config({ path: envPath });
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+console.log("Loading .env from:", envPath);
+
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import authenticateToken from "./middleware/authMiddleware";
 import loginEndpoints from "./controllers/logincontroller";
 import messagesEndpoints from "./controllers/chat";
 import chatClientEndpoints from "./controllers/chatClientController";
-import dotenv from "dotenv";
-dotenv.config();
 
 const app: Express = express();
 const PORT: number = 5001;

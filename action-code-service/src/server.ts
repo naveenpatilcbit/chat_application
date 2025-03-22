@@ -1,7 +1,7 @@
 import express from "express";
 import actionCodeRoutes from "./routes/actionCodeRoutes";
 import logger from "./services/loggerService";
-
+import genericListRoutes from "./routes/gnericRoutes";
 const app = express();
 
 // Port configuration
@@ -14,7 +14,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/action-codes", actionCodeRoutes);
-
+app.use("/api/", genericListRoutes);
 // Error handling middleware
 app.use(
   (
