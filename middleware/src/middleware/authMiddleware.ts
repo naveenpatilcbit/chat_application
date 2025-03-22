@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import redisClient from "../services/redisClient";
+import logger from "../services/loggerService";
 
 interface JwtPayload {
   userId: string;
@@ -21,8 +22,9 @@ const authenticateToken = async (
   try {
     // Retrieve token from the Authorization header
     const authHeader = req.headers["authorization"];
+    logger.info("Auth header:" + authHeader);
     const token = authHeader && authHeader.split(" ")[1];
-
+    logger.info("Token:" + token);
     if (!token) {
       res.status(401).json({ message: "No token provided" });
       return;
@@ -42,6 +44,7 @@ const authenticateToken = async (
       process.env.JWT_SECRET as string
     ) as JwtPayload;
     req.user = user;
+    logger.info("User:", req.user);
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {

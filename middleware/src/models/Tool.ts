@@ -53,4 +53,23 @@ export class Tool {
   public setSupportedMethods(methods: Method[]): void {
     this.supportedMethods = [...methods];
   }
+
+  public toJSON(): any {
+    return {
+      toolName: this.name,
+      toolDescription: this.description,
+      baseUrl: this.baseUrl,
+      methods: this.supportedMethods.map((method) => ({
+        methodName: method.methodName,
+        methodDesc: method.description,
+        endPoint: method.endpointURL,
+        methodParams:
+          method.parameters?.map((param) => ({
+            paramName: param.name,
+            paramDesc: param.description,
+            paramType: param.type || "String",
+          })) || [],
+      })),
+    };
+  }
 }

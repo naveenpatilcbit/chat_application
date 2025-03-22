@@ -1,7 +1,7 @@
 // conversationService.js
 const { ConversationChain } = require("langchain/chains");
 const { BufferMemory } = require("langchain/memory");
-const getLLMProvider = require("./../factories/llm");
+const getLLMProvider = require("./../factories/llmfactory");
 
 /**
  * Processes a chat message using a selected LLM provider while maintaining context.

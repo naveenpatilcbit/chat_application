@@ -3,6 +3,7 @@ import cors from "cors";
 import authenticateToken from "./middleware/authMiddleware";
 import loginEndpoints from "./controllers/logincontroller";
 import messagesEndpoints from "./controllers/chat";
+import chatClientEndpoints from "./controllers/chatClientController";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use((req: Request, res: Response, next: NextFunction): void => {
 
 app.use("/", messagesEndpoints);
 app.use("/", loginEndpoints);
+app.use("/", chatClientEndpoints);
 
 app.listen(PORT, () => {
   console.log(`ChatApp Middleware running at http://localhost:${PORT}`);

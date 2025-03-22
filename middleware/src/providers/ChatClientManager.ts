@@ -1,5 +1,5 @@
 import { ChatClient } from "../models/ChatClient";
-
+import logger from "../services/loggerService";
 export class ChatClientManager {
   private static instance: ChatClientManager;
   private clients: Map<string, ChatClient>;
@@ -23,6 +23,7 @@ export class ChatClientManager {
   }
 
   public getClient(sessionId: string): ChatClient | undefined {
+    logger.info("Getting client for sessionId:" + this.clients);
     return this.clients.get(sessionId);
   }
 

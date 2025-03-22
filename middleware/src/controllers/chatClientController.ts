@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ChatClientManager } from "./../providers/ChatClientManager";
 import { Tool } from "../models/Tool";
 import authenticateToken from "../middleware/authMiddleware";
-
+import logger from "../services/loggerService";
 const router = Router();
 const chatClientManager = ChatClientManager.getInstance();
 // Update model for a specific user's ChatClient
@@ -20,7 +20,7 @@ router.post("/update-model", authenticateToken, (req, res) => {
         .status(401)
         .json({ message: "Authentication token is required" });
     }
-
+    logger.info("Getting client for token:", token);
     const chatClient = chatClientManager.getClient(token);
     if (!chatClient) {
       return res
@@ -38,8 +38,9 @@ router.post("/update-model", authenticateToken, (req, res) => {
 
 // Update tools for a specific user's ChatClient
 router.post("/update-tools", authenticateToken, (req, res) => {
+  logger.info("Updating tools:");
   try {
-    const { tools } = req.body;
+    const tools = req.body.tools;
 
     const token = req.headers.authorization?.split(" ")[1];
 
@@ -52,7 +53,7 @@ router.post("/update-tools", authenticateToken, (req, res) => {
         .status(401)
         .json({ message: "Authentication token is required" });
     }
-
+    logger.info("Getting client for token:" + token);
     const chatClient = chatClientManager.getClient(token);
     if (!chatClient) {
       return res

@@ -4,6 +4,11 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 3001, // Change this to your desired port
+    // You can also use process.env.PORT to make it configurable:
+    // port: parseInt(process.env.PORT || "3001"),
+  },
   resolve: {
     alias: {
       "@components": path.resolve(__dirname, "src/components"),
